@@ -4,7 +4,7 @@ from PyQt6.QtCore import QThread, QObject, pyqtSignal, Qt, QTimer
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QFrame, 
     QLabel, QPushButton, QStackedWidget, QSizePolicy, QFileDialog, 
-    QMessageBox, QInputDialog, QProgressDialog
+    QMessageBox, QInputDialog, QProgressDialog, QApplication # <── ¡IMPORTADO AQUÍ!
 )
 from PyQt6.QtGui import QAction
 from ui.theme import C, STYLESHEET
@@ -147,7 +147,6 @@ class MainWindow(QMainWindow):
 
         try:
             if archivo.endswith('.csv'):
-                # ── SOLUCIÓN VELOCIDAD: Pasar dayfirst al lector inicial del CSV ──
                 df = pd.read_csv(archivo, dayfirst=True)
             else:
                 df = pd.read_excel(archivo)
@@ -182,7 +181,6 @@ class MainWindow(QMainWindow):
         else:
             QMessageBox.information(self, "Éxito", f"Se importaron correctamente {total} registros sin errores.")
         
-        # ── SOLUCIÓN REFRESCO: Forzar actualización explícita de cada componente visual de las páginas ──
         for page in self._pages:
             if hasattr(page, "refresh"):
                 try:
@@ -217,6 +215,13 @@ class MainWindow(QMainWindow):
             lay.addWidget(btn); self._nav_btns.append((idx, btn))
 
         lay.addStretch(); lay.addWidget(hline())
+        
+        # ── NUEVO: BOTÓN DE CAMBIO DE FORMATO (OSCURO / CLARO) ──
+        self.es_modo_oscuro = True
+        self.btn_tema = QPushButton("☀️ Modo Claro")
+        self.btn_tema.setStyleSheet(f"QPushButton {{background:transparent;color:{C['text2']};border:none;padding:12px;text-align:left;}} QPushButton:hover {{background:rgba(0,200,255,0.07);color:{C['accent']};}}")
+        self.btn_tema.clicked.connect(self.alternar_tema)
+        lay.addWidget(self.btn_tema)
         
         user_frame = QFrame(); user_frame.setStyleSheet(f"background:{C['sidebar']};padding:4px;")
         ul = QVBoxLayout(user_frame); ul.setSpacing(3)
@@ -255,3 +260,30 @@ class MainWindow(QMainWindow):
         from ui.login import LoginWindow
         login = LoginWindow()
         login.show()
+    
+    def alternar_tema(self):
+        """Alterna las paletas de colores globales y refresca la aplicación completa."""
+        import ui.theme as theme_mod
+        
+        if self.es_modo_oscuro:
+            theme_mod.C = theme_mod.C_LIGHT.copy()
+            self.btn_tema.setText("🌙 Modo Oscuro")
+            self.es_modo_oscuro = False
+        else:
+            theme_mod.C = theme_mod.C_DARK.copy()
+            self.btn_tema.setText("☀️ Modo Claro")
+            self.es_modo_oscuro = True
+            
+        nuevo_style = theme_mod.obtener_stylesheet(theme_mod.C)
+        QApplication.instance().setStyleSheet(nuevo_style)
+        
+        import ui.charts as charts_mod
+        charts_mod.BG   = theme_mod.C["bg"]
+        charts_mod.PAN  = theme_mod.C["card"]
+        charts_mod.GRID = theme_mod.C["border"]
+        charts_mod.TXT  = theme_mod.C["text"]
+        charts_mod.TXT2 = theme_mod.C["text2"]
+        charts_mod.ACC  = theme_mod.C["accent"]
+        charts_mod.ACC2 = theme_mod.C["accent2"]
+        
+        self._auto_refresh()
