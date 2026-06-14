@@ -4,7 +4,7 @@ from PyQt6.QtCore import QThread, QObject, pyqtSignal, Qt, QTimer
 from PyQt6.QtWidgets import (
     QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QFrame, 
     QLabel, QPushButton, QStackedWidget, QSizePolicy, QFileDialog, 
-    QMessageBox, QInputDialog, QProgressDialog, QApplication # <── ¡IMPORTADO AQUÍ!
+    QMessageBox, QInputDialog, QProgressDialog, QApplication 
 )
 from PyQt6.QtGui import QAction
 from ui.theme import C, STYLESHEET
@@ -45,7 +45,6 @@ class ImportarExcelWorker(QObject):
                 fecha_raw = row.get("Fecha")
                 if pd.notna(fecha_raw):
                     try: 
-                        # ── SOLUCIÓN USERWARNING: Forzar análisis con dayfirst=True ──
                         fecha = pd.to_datetime(fecha_raw, dayfirst=True).strftime("%Y-%m-%d")
                     except: 
                         fecha = datetime.now().strftime("%Y-%m-%d")

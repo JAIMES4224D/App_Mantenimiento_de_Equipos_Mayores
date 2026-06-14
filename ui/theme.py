@@ -24,25 +24,25 @@ C_LIGHT = dict(
     panel   = "#FFFFFF",
     sidebar = "#E1E8ED",
     card    = "#F8FAFC",
-    accent  = "#0088CC",  # Azul más profundo para mantener buen contraste en fondos claros
+    accent  = "#0088CC",  
     accent2 = "#E65100",
     green   = "#16A34A",
     amber   = "#D97706",
     purple  = "#7C3AED",
     red     = "#DC2626",
-    text    = "#1E293B",  # Texto oscuro para legibilidad
+    text    = "#1E293B",  
     text2   = "#64748B",
     border  = "#CBD5E1",
     input   = "#F1F5F9",
 )
 
-# Variable de referencia estática que inicia por defecto en Oscuro
+
 C = C_DARK.copy()
 
 
 def obtener_stylesheet(colores):
     """Genera la hoja de estilos inyectando la paleta de colores seleccionada."""
-    # Validación simple para controlar el color de texto en botones principales
+    
     color_texto_primario = "#FFFFFF" if colores == C_LIGHT else "#000000"
     
     return f"""
@@ -282,10 +282,9 @@ def obtener_stylesheet(colores):
     QMessageBox QLabel {{ color: {colores['text']}; }}
     """
 
-# Mantener la variable STYLESHEET original cargada con C_DARK por defecto al iniciar
 STYLESHEET = obtener_stylesheet(C)
 
-# Catálogos de constantes
+
 MESES = {1:"Enero",2:"Febrero",3:"Marzo",4:"Abril",5:"Mayo",6:"Junio",
          7:"Julio",8:"Agosto",9:"Septiembre",10:"Octubre",11:"Noviembre",12:"Diciembre"}
 MESES_CORTO = {1:"Ene",2:"Feb",3:"Mar",4:"Abr",5:"May",6:"Jun",
